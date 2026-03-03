@@ -19,7 +19,7 @@ HTTP_ERROR_MAP = {
 
 def _handle_http_error(status_code:int)-> None:
     message,retryable = HTTP_ERROR_MAP.get(status_code,f"Unexpeced HTTP status: {status_code}",True)
-    raise ExternalRequestError(message=message,retryable=return)
+    raise ExternalRequestError(message=message,retryable=True)
     
 
 def external_data_fetch(*,url:str,header: dict, params:dict):

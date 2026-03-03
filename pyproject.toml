@@ -1,5 +1,5 @@
 [project]
-name = "cdk-data-pipeline"
+name = "Data-Platform"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
