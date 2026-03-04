@@ -18,13 +18,13 @@ HTTP_ERROR_MAP = {
 }
 
 def _handle_http_error(status_code:int)-> None:
-    message,retryable = HTTP_ERROR_MAP.get(status_code,f"Unexpeced HTTP status: {status_code}",True)
-    raise ExternalRequestError(message=message,retryable=True)
+    message,retryable = HTTP_ERROR_MAP.get(status_code,(f"Unexpected HTTP status: {status_code}",True))
+    raise ExternalRequestError(message=message,retryable=retryable)
     
 
-def external_data_fetch(*,url:str,header: dict, params:dict):
+def external_data_fetch(*,url:str,headers: dict, params:dict,timeout:int):
     try:
-        response = requests.get(url,headers=header, params={"api_key": params},timeout=30)
+        response = requests.get(url,headers=headers, params=params,timeout=timeout)
     except requests.Timeout as e:
         raise ExternalRequestError(message="Network timeout",retryable=True) from e
 
@@ -34,17 +34,21 @@ def external_data_fetch(*,url:str,header: dict, params:dict):
     except requests.RequestException as e:
         raise ExternalRequestError(message="Unexpected Failure",retryable=True) from e
 
-    status_code = response.status_code()
+    status_code = response.status_code
 
-    if status_code > 400:
+    if status_code >= 400:
         _handle_http_error(status_code=status_code)
-    
-    return response
+    try:
+        payload = response.json()
+    except ValueError as e:
+        raise ExternalRequestError(message="Invalid Json in response", retryable=False) from e
+
+    return payload
         
 
 
 
 
-
-def external_data_stream(*,url:str,header:dict,params:dict):
+# TODO build the function 
+def external_data_stream(*,url:str,headers:dict,params:dict,stream=True,timeout:int):
     pass
